@@ -48,4 +48,11 @@ jobs:
           python -m venv /tmp/venom-wheel-test
           /tmp/venom-wheel-test/bin/python -m pip install --upgrade pip
           /tmp/venom-wheel-test/bin/python -m pip install dist/*.whl
+          /tmp/venom-wheel-test/bin/python -m pip check
           /tmp/venom-wheel-test/bin/venom --help
+      - name: Upload distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-distributions
+          path: dist/*
+          if-no-files-found: error
