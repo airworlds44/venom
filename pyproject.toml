@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "venom-ai-evals"
+version = "0.1.0"
+description = "A tiny vendor-neutral CLI for reproducible AI model comparisons."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "airworlds44"}]
+dependencies = [
+  "openai>=1.0.0",
+  "anthropic>=0.25.0",
+]
+
+[project.scripts]
+venom = "venom.cli:main"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
