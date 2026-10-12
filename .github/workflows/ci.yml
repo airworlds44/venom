@@ -51,7 +51,7 @@ jobs:
           /tmp/venom-wheel-test/bin/python -m pip check
           /tmp/venom-wheel-test/bin/venom --help
       - name: Upload distributions
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: python-distributions
           path: dist/*
