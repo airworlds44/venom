@@ -6,7 +6,8 @@ import sys
 
 from .core import append_jsonl, execute, parse_model_spec
 from .pricing import PricingTable, load_pricing
-from .report import generate_html_report
+from .report import generate_html_report, load_jsonl
+from .scoring import load_scorers, score_rows, write_scores_jsonl
 from .suites import load_suite
 
 
@@ -76,6 +77,20 @@ def _cmd_report(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_score(args: argparse.Namespace) -> int:
+    rows = load_jsonl(args.input)
+    specs = load_scorers(args.rules)
+    results = score_rows(rows, specs)
+    if not results:
+        raise ValueError("No scorers applied to the supplied runs.")
+
+    write_scores_jsonl(args.out, results)
+    passed = sum(result.passed for result in results)
+    failed = len(results) - passed
+    print(f"Scored {len(results)} check(s): {passed} passed, {failed} failed. Wrote {args.out}")
+    return 1 if args.fail_on_miss and failed else 0
+
+
 def _add_pricing_argument(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--pricing",
@@ -126,6 +141,17 @@ def build_parser() -> argparse.ArgumentParser:
     report.add_argument("--out", default="venom-report.html", help="Output HTML path.")
     report.add_argument("--title", default="Venom comparison report")
     report.set_defaults(func=_cmd_report)
+
+    score = sub.add_parser("score", help="Apply deterministic scoring rules to saved JSONL runs.")
+    score.add_argument("--input", required=True, help="Input Venom JSONL file.")
+    score.add_argument("--rules", required=True, help="JSON/YAML scorer configuration.")
+    score.add_argument("--out", default="scores.jsonl", help="Output JSONL path for score results.")
+    score.add_argument(
+        "--fail-on-miss",
+        action="store_true",
+        help="Exit with status 1 when one or more checks fail; useful in CI.",
+    )
+    score.set_defaults(func=_cmd_score)
 
     return parser
 
