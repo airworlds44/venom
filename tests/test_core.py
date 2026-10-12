@@ -2,8 +2,10 @@ import json
 
 import pytest
 
-from venom.core import append_jsonl, parse_model_spec
+from venom.core import PROVIDERS, append_jsonl, execute, parse_model_spec
 from venom.models import RunResult
+from venom.pricing import ModelPrice
+from venom.providers import ProviderResponse
 
 
 def test_parse_model_spec():
@@ -28,3 +30,25 @@ def test_append_jsonl(tmp_path):
     saved = json.loads(path.read_text().strip())
     assert saved["provider"] == "openai"
     assert saved["latency_ms"] == 12.35
+    assert saved["input_tokens"] is None
+    assert saved["estimated_cost_usd"] is None
+
+
+def test_execute_captures_usage_and_estimated_cost(monkeypatch):
+    def fake_provider(model: str, prompt: str) -> ProviderResponse:
+        assert model == "test-model"
+        assert prompt == "hello"
+        return ProviderResponse(text="world", input_tokens=1_000, output_tokens=500)
+
+    monkeypatch.setitem(PROVIDERS, "openai", fake_provider)
+    result = execute(
+        "openai",
+        "test-model",
+        "hello",
+        pricing={"openai:test-model": ModelPrice(2.0, 8.0)},
+    )
+
+    assert result.response == "world"
+    assert result.input_tokens == 1_000
+    assert result.output_tokens == 500
+    assert result.estimated_cost_usd == 0.006

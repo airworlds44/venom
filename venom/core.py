@@ -6,9 +6,10 @@ from pathlib import Path
 from typing import Callable
 
 from .models import RunResult
-from .providers import run_anthropic, run_openai
+from .pricing import PricingTable, estimate_cost_usd
+from .providers import ProviderResponse, run_anthropic, run_openai
 
-ProviderFn = Callable[[str, str], str]
+ProviderFn = Callable[[str, str], ProviderResponse]
 
 PROVIDERS: dict[str, ProviderFn] = {
     "openai": run_openai,
@@ -16,21 +17,37 @@ PROVIDERS: dict[str, ProviderFn] = {
 }
 
 
-def execute(provider: str, model: str, prompt: str) -> RunResult:
+def execute(
+    provider: str,
+    model: str,
+    prompt: str,
+    *,
+    pricing: PricingTable | None = None,
+) -> RunResult:
     provider = provider.lower().strip()
     if provider not in PROVIDERS:
         supported = ", ".join(sorted(PROVIDERS))
         raise ValueError(f"Unsupported provider '{provider}'. Supported: {supported}")
 
     started = time.perf_counter()
-    response = PROVIDERS[provider](model, prompt)
+    provider_result = PROVIDERS[provider](model, prompt)
     elapsed_ms = (time.perf_counter() - started) * 1000
+    estimated_cost = estimate_cost_usd(
+        provider,
+        model,
+        provider_result.input_tokens,
+        provider_result.output_tokens,
+        pricing,
+    )
     return RunResult.create(
         provider=provider,
         model=model,
         prompt=prompt,
-        response=response,
+        response=provider_result.text,
         latency_ms=elapsed_ms,
+        input_tokens=provider_result.input_tokens,
+        output_tokens=provider_result.output_tokens,
+        estimated_cost_usd=estimated_cost,
     )
 
 
