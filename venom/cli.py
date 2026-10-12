@@ -6,6 +6,7 @@ import sys
 
 from .core import append_jsonl, execute, parse_model_spec
 from .pricing import PricingTable, load_pricing
+from .report import generate_html_report
 from .suites import load_suite
 
 
@@ -69,6 +70,12 @@ def _cmd_suite(args: argparse.Namespace) -> int:
     return 1 if had_error else 0
 
 
+def _cmd_report(args: argparse.Namespace) -> int:
+    count = generate_html_report(args.input, args.out, title=args.title)
+    print(f"Wrote {count} run(s) to {args.out}")
+    return 0
+
+
 def _add_pricing_argument(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--pricing",
@@ -113,6 +120,12 @@ def build_parser() -> argparse.ArgumentParser:
     suite.add_argument("--out", default="runs.jsonl")
     _add_pricing_argument(suite)
     suite.set_defaults(func=_cmd_suite)
+
+    report = sub.add_parser("report", help="Generate a self-contained HTML report from saved JSONL runs.")
+    report.add_argument("--input", required=True, help="Input Venom JSONL file.")
+    report.add_argument("--out", default="venom-report.html", help="Output HTML path.")
+    report.add_argument("--title", default="Venom comparison report")
+    report.set_defaults(func=_cmd_report)
 
     return parser
 
