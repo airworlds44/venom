@@ -15,6 +15,7 @@ AI model comparisons are often done by copying prompts between browser tabs. Ven
 - run reusable prompt suites from JSON or YAML
 - record latency, token usage, provider, model, prompt, response, and timestamp
 - optionally estimate cost from a pricing table you control
+- turn saved runs into a self-contained HTML comparison report
 - save results as JSONL so they are easy to diff, analyze, or feed into notebooks
 - keep API keys in environment variables rather than source code
 
@@ -113,6 +114,25 @@ venom compare \
 
 Pricing lookup is exact by `provider:model`. If a model is missing from the file, Venom leaves `estimated_cost_usd` as `null` rather than guessing.
 
+## HTML reports
+
+Turn an existing JSONL run file into a portable report without making any additional model calls:
+
+```bash
+venom report --input runs.jsonl --out venom-report.html
+```
+
+The report groups results by prompt and shows each provider/model response alongside latency, token usage, estimated cost, and timestamp. It is one self-contained HTML file with no external assets, and model output is HTML-escaped before rendering.
+
+You can also set a report title:
+
+```bash
+venom report \
+  --input runs.jsonl \
+  --out benchmark.html \
+  --title "Model benchmark — checkout support prompts"
+```
+
 ## Output
 
 Each run is written as a JSON object, for example:
@@ -140,7 +160,7 @@ Each run is written as a JSON object, for example:
 - [x] prompt suites from YAML/JSON
 - [ ] simple scoring hooks
 - [x] cost/token metadata where providers expose it
-- [ ] HTML comparison report
+- [x] HTML comparison report
 - [ ] CI-friendly non-interactive benchmark mode
 
 ## Project philosophy
