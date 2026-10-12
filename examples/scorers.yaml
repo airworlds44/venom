@@ -1,0 +1,17 @@
+scorers:
+  - name: mentions-recursion
+    type: contains
+    value: recursion
+    case_sensitive: false
+    prompt: Explain recursion in one concise paragraph.
+
+  - name: email-validator-shape
+    type: regex
+    value: 'def\s+\w+\s*\('
+    case_sensitive: true
+    prompt: Write a small Python function that validates a non-empty email-like string.
+
+  - name: exact-yes
+    type: exact
+    value: yes
+    strip: true
