@@ -5,6 +5,7 @@ import json
 import sys
 
 from .core import append_jsonl, execute, parse_model_spec
+from .suites import load_suite
 
 
 def _cmd_run(args: argparse.Namespace) -> int:
@@ -26,6 +27,24 @@ def _cmd_compare(args: argparse.Namespace) -> int:
         except Exception as exc:  # CLI boundary: report provider failures independently
             had_error = True
             print(f"ERROR {spec}: {exc}", file=sys.stderr)
+    return 1 if had_error else 0
+
+
+def _cmd_suite(args: argparse.Namespace) -> int:
+    cases = load_suite(args.file)
+    had_error = False
+
+    for case in cases:
+        for spec in args.models:
+            try:
+                provider, model = parse_model_spec(spec)
+                result = execute(provider, model, case.prompt)
+                append_jsonl(args.out, result)
+                print(f"\n=== {case.name} | {provider}:{model} ===\n{result.response}\n")
+            except Exception as exc:  # keep independent runs from blocking the rest of a suite
+                had_error = True
+                print(f"ERROR {case.name} | {spec}: {exc}", file=sys.stderr)
+
     return 1 if had_error else 0
 
 
@@ -51,6 +70,18 @@ def build_parser() -> argparse.ArgumentParser:
     compare.add_argument("--prompt", required=True)
     compare.add_argument("--out", default="runs.jsonl")
     compare.set_defaults(func=_cmd_compare)
+
+    suite = sub.add_parser("suite", help="Run a JSON/YAML prompt suite against one or more models.")
+    suite.add_argument("--file", required=True, help="Path to a .json, .yaml, or .yml prompt suite.")
+    suite.add_argument(
+        "--model",
+        dest="models",
+        action="append",
+        required=True,
+        help="Repeatable provider:model value, e.g. openai:YOUR_MODEL",
+    )
+    suite.add_argument("--out", default="runs.jsonl")
+    suite.set_defaults(func=_cmd_suite)
 
     return parser
 
