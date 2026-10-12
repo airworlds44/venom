@@ -1,0 +1,30 @@
+name: Feature request
+description: Propose a focused improvement to Venom.
+title: "[feature] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What workflow is hard today, and who benefits from improving it?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Describe the smallest useful version of the feature.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Optional workarounds, competing designs, or related tools.
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: I am proposing a focused change that keeps Venom small and understandable.
+          required: true
