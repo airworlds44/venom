@@ -15,6 +15,7 @@ AI model comparisons are often done by copying prompts between browser tabs. Ven
 - run reusable prompt suites from JSON or YAML
 - record latency, token usage, provider, model, prompt, response, and timestamp
 - optionally estimate cost from a pricing table you control
+- apply deterministic pass/fail checks without another model call
 - turn saved runs into a self-contained HTML comparison report
 - save results as JSONL so they are easy to diff, analyze, or feed into notebooks
 - keep API keys in environment variables rather than source code
@@ -114,6 +115,52 @@ venom compare \
 
 Pricing lookup is exact by `provider:model`. If a model is missing from the file, Venom leaves `estimated_cost_usd` as `null` rather than guessing.
 
+## Deterministic scoring
+
+Score saved runs without paying for an LLM judge. Venom includes three small, reproducible rule types:
+
+- `contains` — response contains expected text
+- `exact` — response exactly matches expected text
+- `regex` — response matches a regular expression
+
+Rules can be JSON or YAML. Example:
+
+```yaml
+scorers:
+  - name: mentions-recursion
+    type: contains
+    value: recursion
+    case_sensitive: false
+
+  - name: looks-like-python-function
+    type: regex
+    value: 'def\s+\w+\s*\('
+
+  - name: exact-yes
+    type: exact
+    value: yes
+    strip: true
+```
+
+Apply the rules to an existing run file:
+
+```bash
+venom score \
+  --input runs.jsonl \
+  --rules examples/scorers.yaml \
+  --out scores.jsonl
+```
+
+Each score is written separately with provider, model, prompt, scorer name, pass/fail, a `0.0` or `1.0` numeric score, and a short explanation. Add `prompt` to a scorer rule to apply it only to one exact prompt string.
+
+For CI, use `--fail-on-miss` so the command exits with status 1 when any applied check fails:
+
+```bash
+venom score --input runs.jsonl --rules scorers.yaml --fail-on-miss
+```
+
+This first scoring layer intentionally avoids LLM-as-a-judge so results stay deterministic, cheap, and easy to test.
+
 ## HTML reports
 
 Turn an existing JSONL run file into a portable report without making any additional model calls:
@@ -158,7 +205,7 @@ Each run is written as a JSON object, for example:
 - [x] JSONL run logging
 - [x] multi-model comparison command
 - [x] prompt suites from YAML/JSON
-- [ ] simple scoring hooks
+- [x] simple deterministic scoring hooks
 - [x] cost/token metadata where providers expose it
 - [x] HTML comparison report
 - [ ] CI-friendly non-interactive benchmark mode
