@@ -12,6 +12,7 @@ AI model comparisons are often done by copying prompts between browser tabs. Ven
 
 - run one prompt against OpenAI or Anthropic
 - compare multiple provider/model pairs from one command
+- run reusable prompt suites from JSON or YAML
 - record latency, provider, model, prompt, response, and timestamp
 - save results as JSONL so they are easy to diff, analyze, or feed into notebooks
 - keep API keys in environment variables rather than source code
@@ -55,6 +56,30 @@ venom compare \
 
 Use model IDs that are available in your own provider account.
 
+## Prompt suites
+
+A prompt suite is a JSON or YAML file with named prompts. For example:
+
+```yaml
+prompts:
+  - name: explain-recursion
+    prompt: Explain recursion in one concise paragraph.
+  - name: write-validator
+    prompt: Write a small Python function that validates a non-empty email-like string.
+```
+
+Run the suite against one or more models:
+
+```bash
+venom suite \
+  --file examples/prompts.yaml \
+  --model openai:YOUR_OPENAI_MODEL \
+  --model anthropic:YOUR_CLAUDE_MODEL \
+  --out runs.jsonl
+```
+
+Each prompt/model pair runs independently, so one provider failure does not stop the rest of the suite.
+
 ## Output
 
 Each run is written as a JSON object, for example:
@@ -76,7 +101,7 @@ Each run is written as a JSON object, for example:
 - [x] Anthropic provider adapter
 - [x] JSONL run logging
 - [x] multi-model comparison command
-- [ ] prompt suites from YAML/JSON
+- [x] prompt suites from YAML/JSON
 - [ ] simple scoring hooks
 - [ ] cost/token metadata where providers expose it
 - [ ] HTML comparison report
