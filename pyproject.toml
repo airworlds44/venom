@@ -13,6 +13,7 @@ authors = [{name = "airworlds44"}]
 dependencies = [
   "openai>=1.0.0",
   "anthropic>=0.25.0",
+  "PyYAML>=6.0",
 ]
 
 [project.scripts]
