@@ -1,0 +1,63 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  github-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Verify tag matches package version
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag_version="${GITHUB_REF_NAME#v}"
+          project_version="$(python - <<'PY'
+          import tomllib
+          with open('pyproject.toml', 'rb') as handle:
+              print(tomllib.load(handle)['project']['version'])
+          PY
+          )"
+          if [[ "$tag_version" != "$project_version" ]]; then
+            echo "Tag version $tag_version does not match pyproject.toml version $project_version" >&2
+            exit 1
+          fi
+
+      - name: Build distributions
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build twine
+          python -m build
+
+      - name: Validate distributions
+        run: python -m twine check dist/*
+
+      - name: Smoke-test wheel
+        run: |
+          python -m venv /tmp/venom-release-test
+          /tmp/venom-release-test/bin/python -m pip install --upgrade pip
+          /tmp/venom-release-test/bin/python -m pip install dist/*.whl
+          /tmp/venom-release-test/bin/python -m pip check
+          /tmp/venom-release-test/bin/venom --help
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/* \
+            --verify-tag \
+            --title "Venom $GITHUB_REF_NAME" \
+            --generate-notes
