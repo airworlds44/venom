@@ -4,7 +4,7 @@
 
 It is aimed at indie builders, researchers, and vibe coders who want to test the same prompt across providers without building a full evaluation stack.
 
-> Status: early alpha. The project is intentionally small and welcomes contributors.
+> Status: **0.1.0 release candidate / early alpha.** The codebase is usable today, but the project has not yet been advertised as a published PyPI package or GitHub Release.
 
 ## Why Venom?
 
@@ -34,6 +34,21 @@ python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -e .
 ```
+
+### Try the report flow without an API key
+
+The repository includes `examples/demo-runs.jsonl`, a clearly labeled **synthetic demo fixture**. It exists only to demonstrate Venom's artifact/report workflow and is not presented as a real OpenAI/Anthropic benchmark.
+
+```bash
+venom report \
+  --input examples/demo-runs.jsonl \
+  --out demo-report.html \
+  --title "Venom synthetic demo"
+```
+
+Open `demo-report.html` in a browser to see the comparison format without making any API calls.
+
+### Run live models
 
 Set the API key for the provider you want to use:
 
@@ -223,7 +238,9 @@ Each run is written as a JSON object, for example:
 }
 ```
 
-## Roadmap
+## 0.1.0 release scope
+
+The initial alpha scope is complete:
 
 - [x] OpenAI provider adapter
 - [x] Anthropic provider adapter
@@ -235,6 +252,8 @@ Each run is written as a JSON object, for example:
 - [x] HTML comparison report
 - [x] CI-friendly non-interactive benchmark mode
 
+See [CHANGELOG.md](CHANGELOG.md) for release notes. A GitHub Release or PyPI package should only be considered published after that publishing step actually happens.
+
 ## Project philosophy
 
 Venom should stay understandable. A new contributor should be able to read most of the codebase in one sitting. Provider-specific logic belongs in small adapters; recorded results should use a simple, portable format.
@@ -245,7 +264,7 @@ Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md). Go
 
 ## Security
 
-Never commit API keys. Venom reads credentials from provider SDK environment variables. If you accidentally publish a key, revoke it with the provider immediately.
+Never commit API keys. Venom reads credentials from provider SDK environment variables. If you accidentally publish a key, revoke it with the provider immediately. See [SECURITY.md](SECURITY.md) for more detail.
 
 ## License
 
