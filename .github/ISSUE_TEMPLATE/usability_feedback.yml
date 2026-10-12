@@ -1,0 +1,50 @@
+name: Usability feedback
+description: Share setup or workflow feedback after trying Venom.
+title: "[feedback] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for trying Venom. Please do not include API keys, private prompts, or sensitive benchmark data.
+  - type: dropdown
+    id: path
+    attributes:
+      label: What did you try?
+      options:
+        - Synthetic demo report
+        - Single model run
+        - Multi-model comparison
+        - Prompt suite
+        - Deterministic scoring
+        - Benchmark mode
+        - Installation / packaging only
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS and Python version, for example macOS / Python 3.12.
+      placeholder: Ubuntu 24.04 / Python 3.12
+    validations:
+      required: true
+  - type: textarea
+    id: worked
+    attributes:
+      label: What worked well?
+    validations:
+      required: true
+  - type: textarea
+    id: confusing
+    attributes:
+      label: What was confusing or broken?
+    validations:
+      required: true
+  - type: textarea
+    id: value
+    attributes:
+      label: Would this solve a real problem for you?
+      description: A short yes/no/maybe plus why is enough.
+    validations:
+      required: true
