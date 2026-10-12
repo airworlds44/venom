@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Venom is a small vendor-neutral CLI for reproducible AI model comparisons.">
+  <title>Venom — reproducible AI model comparisons</title>
+  <style>
+    :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { max-width: 960px; margin: 0 auto; padding: 3rem 1.25rem 5rem; line-height: 1.6; }
+    h1 { font-size: clamp(2.5rem, 8vw, 5rem); margin: 0 0 .5rem; letter-spacing: -.04em; }
+    h2 { margin-top: 2.5rem; }
+    .lede { font-size: 1.25rem; max-width: 760px; }
+    .actions { display: flex; flex-wrap: wrap; gap: .75rem; margin: 1.5rem 0 2.5rem; }
+    a.button { display: inline-block; padding: .7rem 1rem; border: 1px solid currentColor; border-radius: 999px; text-decoration: none; font-weight: 650; }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    pre { padding: 1rem; border-radius: 12px; overflow-x: auto; background: color-mix(in srgb, currentColor 7%, transparent); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+    .card { border: 1px solid color-mix(in srgb, currentColor 22%, transparent); border-radius: 14px; padding: 1rem; }
+    footer { margin-top: 4rem; opacity: .72; }
+  </style>
+</head>
+<body>
+  <main>
+    <p><strong>Open-source • Python • early alpha</strong></p>
+    <h1>Venom</h1>
+    <p class="lede">A small, vendor-neutral CLI for running the same prompts across AI providers, recording reproducible results, scoring outputs, tracking token usage and optional costs, and generating shareable HTML reports.</p>
+
+    <div class="actions">
+      <a class="button" href="https://github.com/airworlds44/venom">View on GitHub</a>
+      <a class="button" href="https://github.com/airworlds44/venom#quick-start">Quick start</a>
+    </div>
+
+    <div class="grid">
+      <div class="card"><strong>Compare models</strong><br>Run one prompt or a reusable prompt suite across OpenAI and Anthropic model IDs available to your account.</div>
+      <div class="card"><strong>Keep evidence</strong><br>Save JSONL with responses, latency, token metadata, timestamps, and optional local cost estimates.</div>
+      <div class="card"><strong>Score deterministically</strong><br>Apply exact, contains, and regex checks without paying for an LLM judge.</div>
+      <div class="card"><strong>Use it in CI</strong><br>Benchmark mode emits fresh run, score, report, and summary artifacts with useful exit codes.</div>
+    </div>
+
+    <h2>Try the report flow without an API key</h2>
+    <p>The repository includes a clearly labeled synthetic demo fixture. It is not presented as a live provider benchmark.</p>
+    <pre><code>git clone https://github.com/airworlds44/venom.git
+cd venom
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+venom report --input examples/demo-runs.jsonl --out demo-report.html</code></pre>
+
+    <h2>One-command benchmark</h2>
+    <pre><code>venom benchmark \
+  --suite examples/prompts.yaml \
+  --model openai:YOUR_OPENAI_MODEL \
+  --model anthropic:YOUR_CLAUDE_MODEL \
+  --rules examples/scorers.yaml \
+  --out-dir benchmark-results \
+  --fail-on-miss</code></pre>
+
+    <p>Venom does not bundle provider prices or API credentials. Pricing is opt-in through a local file, and provider SDKs read your environment variables normally.</p>
+  </main>
+  <footer>Venom is not affiliated with OpenAI or Anthropic. MIT licensed.</footer>
+</body>
+</html>
