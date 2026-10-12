@@ -1,0 +1,5 @@
+prompts:
+  - name: explain-recursion
+    prompt: Explain recursion in one concise paragraph.
+  - name: write-validator
+    prompt: Write a small Python function that validates a non-empty email-like string.
