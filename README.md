@@ -13,7 +13,8 @@ AI model comparisons are often done by copying prompts between browser tabs. Ven
 - run one prompt against OpenAI or Anthropic
 - compare multiple provider/model pairs from one command
 - run reusable prompt suites from JSON or YAML
-- record latency, provider, model, prompt, response, and timestamp
+- record latency, token usage, provider, model, prompt, response, and timestamp
+- optionally estimate cost from a pricing table you control
 - save results as JSONL so they are easy to diff, analyze, or feed into notebooks
 - keep API keys in environment variables rather than source code
 
@@ -80,6 +81,38 @@ venom suite \
 
 Each prompt/model pair runs independently, so one provider failure does not stop the rest of the suite.
 
+## Token usage and cost estimates
+
+When the provider SDK exposes usage metadata, Venom records input and output token counts automatically.
+
+Cost estimates are deliberately **opt-in**. Venom does not ship a model pricing table because provider prices can change. Instead, create a local JSON file with the prices you want Venom to use:
+
+```json
+{
+  "openai:YOUR_OPENAI_MODEL": {
+    "input_per_million": 0.0,
+    "output_per_million": 0.0
+  },
+  "anthropic:YOUR_CLAUDE_MODEL": {
+    "input_per_million": 0.0,
+    "output_per_million": 0.0
+  }
+}
+```
+
+Replace the zeroes with current prices from the provider, then pass the file with `--pricing`:
+
+```bash
+venom compare \
+  --model openai:YOUR_OPENAI_MODEL \
+  --model anthropic:YOUR_CLAUDE_MODEL \
+  --prompt "Summarize this idea in three bullets." \
+  --pricing pricing.json \
+  --out runs.jsonl
+```
+
+Pricing lookup is exact by `provider:model`. If a model is missing from the file, Venom leaves `estimated_cost_usd` as `null` rather than guessing.
+
 ## Output
 
 Each run is written as a JSON object, for example:
@@ -91,7 +124,10 @@ Each run is written as a JSON object, for example:
   "prompt": "Explain recursion in one paragraph.",
   "response": "...",
   "latency_ms": 842.31,
-  "created_at": "2026-10-12T17:30:00+00:00"
+  "created_at": "2026-10-12T17:30:00+00:00",
+  "input_tokens": 24,
+  "output_tokens": 73,
+  "estimated_cost_usd": null
 }
 ```
 
@@ -103,7 +139,7 @@ Each run is written as a JSON object, for example:
 - [x] multi-model comparison command
 - [x] prompt suites from YAML/JSON
 - [ ] simple scoring hooks
-- [ ] cost/token metadata where providers expose it
+- [x] cost/token metadata where providers expose it
 - [ ] HTML comparison report
 - [ ] CI-friendly non-interactive benchmark mode
 
