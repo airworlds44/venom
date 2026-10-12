@@ -4,6 +4,7 @@ import argparse
 import json
 import sys
 
+from .benchmark import run_benchmark
 from .core import append_jsonl, execute, parse_model_spec
 from .pricing import PricingTable, load_pricing
 from .report import generate_html_report, load_jsonl
@@ -91,6 +92,24 @@ def _cmd_score(args: argparse.Namespace) -> int:
     return 1 if args.fail_on_miss and failed else 0
 
 
+def _cmd_benchmark(args: argparse.Namespace) -> int:
+    pricing = _load_optional_pricing(args.pricing)
+    summary = run_benchmark(
+        args.suite,
+        args.models,
+        args.out_dir,
+        pricing=pricing,
+        scoring_rules=args.rules,
+        report_title=args.title,
+    )
+    print(json.dumps(summary, indent=2, ensure_ascii=False))
+    if summary["run_failure_count"]:
+        return 1
+    if args.fail_on_miss and summary["score_failures"]:
+        return 1
+    return 0
+
+
 def _add_pricing_argument(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--pricing",
@@ -152,6 +171,29 @@ def build_parser() -> argparse.ArgumentParser:
         help="Exit with status 1 when one or more checks fail; useful in CI.",
     )
     score.set_defaults(func=_cmd_score)
+
+    benchmark = sub.add_parser(
+        "benchmark",
+        help="Run a complete prompt-suite benchmark and write reproducible artifacts.",
+    )
+    benchmark.add_argument("--suite", required=True, help="Path to a JSON/YAML prompt suite.")
+    benchmark.add_argument(
+        "--model",
+        dest="models",
+        action="append",
+        required=True,
+        help="Repeatable provider:model value.",
+    )
+    benchmark.add_argument("--out-dir", default="venom-benchmark", help="Benchmark artifact directory.")
+    benchmark.add_argument("--rules", help="Optional JSON/YAML deterministic scoring rules.")
+    benchmark.add_argument("--title", default="Venom benchmark report")
+    benchmark.add_argument(
+        "--fail-on-miss",
+        action="store_true",
+        help="Return status 1 when deterministic score checks fail.",
+    )
+    _add_pricing_argument(benchmark)
+    benchmark.set_defaults(func=_cmd_benchmark)
 
     return parser
 
