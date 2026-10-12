@@ -10,10 +10,36 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [{name = "airworlds44"}]
+keywords = ["ai", "evals", "llm", "benchmark", "openai", "anthropic", "cli"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Testing",
+]
 dependencies = [
   "openai>=1.0.0",
   "anthropic>=0.25.0",
   "PyYAML>=6.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/airworlds44/venom"
+Repository = "https://github.com/airworlds44/venom"
+Issues = "https://github.com/airworlds44/venom/issues"
+Changelog = "https://github.com/airworlds44/venom/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.2",
+  "pytest>=8",
+  "twine>=5",
 ]
 
 [project.scripts]
