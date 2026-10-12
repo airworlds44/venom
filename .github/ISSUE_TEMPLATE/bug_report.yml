@@ -1,0 +1,47 @@
+name: Bug report
+description: Report a reproducible problem in Venom.
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for helping improve Venom. Please remove API keys and other secrets from logs.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the observed behavior and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      description: Include the command you ran and a minimal prompt or fixture when possible.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Venom version or commit
+      placeholder: 0.1.0 or commit SHA
+  - type: input
+    id: python
+    attributes:
+      label: Python version
+      placeholder: 3.12.7
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Provider
+      options:
+        - OpenAI
+        - Anthropic
+        - Both
+        - Not provider-specific
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant output
+      description: Paste sanitized output only. Never include API keys.
+      render: shell
