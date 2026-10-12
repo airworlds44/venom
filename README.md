@@ -1,5 +1,7 @@
 # Venom
 
+[![CI](https://github.com/airworlds44/venom/actions/workflows/ci.yml/badge.svg)](https://github.com/airworlds44/venom/actions/workflows/ci.yml)
+
 **Venom is a tiny, vendor-neutral CLI for comparing AI model responses and saving reproducible runs.**
 
 It is aimed at indie builders, researchers, and vibe coders who want to test the same prompt across providers without building a full evaluation stack.
@@ -37,7 +39,7 @@ pip install -e .
 
 ### Try the report flow without an API key
 
-The repository includes `examples/demo-runs.jsonl`, a clearly labeled **synthetic demo fixture**. It exists only to demonstrate Venom's artifact/report workflow and is not presented as a real OpenAI/Anthropic benchmark.
+The repository includes `examples/demo-runs.jsonl`, a clearly labeled **synthetic demo fixture**. It exists only to demonstrate Venom's artifact/report workflow and is not presented as a real OpenAI/Anthropic benchmark. A committed example rendering is available at [`docs/demo-report.html`](docs/demo-report.html).
 
 ```bash
 venom report \
@@ -252,7 +254,7 @@ The initial alpha scope is complete:
 - [x] HTML comparison report
 - [x] CI-friendly non-interactive benchmark mode
 
-See [CHANGELOG.md](CHANGELOG.md) for release notes. A GitHub Release or PyPI package should only be considered published after that publishing step actually happens.
+See [CHANGELOG.md](CHANGELOG.md) for release notes and [RELEASING.md](RELEASING.md) for the maintainer release checklist. A GitHub Release or PyPI package should only be considered published after that publishing step actually happens.
 
 ## Project philosophy
 
