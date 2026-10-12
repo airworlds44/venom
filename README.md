@@ -17,6 +17,7 @@ AI model comparisons are often done by copying prompts between browser tabs. Ven
 - optionally estimate cost from a pricing table you control
 - apply deterministic pass/fail checks without another model call
 - turn saved runs into a self-contained HTML comparison report
+- run a complete non-interactive benchmark that emits CI-friendly artifacts
 - save results as JSONL so they are easy to diff, analyze, or feed into notebooks
 - keep API keys in environment variables rather than source code
 
@@ -180,6 +181,30 @@ venom report \
   --title "Model benchmark — checkout support prompts"
 ```
 
+## Benchmark mode
+
+`venom benchmark` ties the pieces together for a non-interactive run. It executes a prompt suite against one or more models and writes a fresh set of owned artifacts into one directory:
+
+- `runs.jsonl` with successful model runs
+- `scores.jsonl` when deterministic rules are supplied
+- `report.html` when at least one run succeeds
+- `summary.json` with planned/successful runs, provider failures, score failures, and optional cost totals
+
+Example:
+
+```bash
+venom benchmark \
+  --suite examples/prompts.yaml \
+  --model openai:YOUR_OPENAI_MODEL \
+  --model anthropic:YOUR_CLAUDE_MODEL \
+  --rules examples/scorers.yaml \
+  --pricing pricing.json \
+  --out-dir benchmark-results \
+  --fail-on-miss
+```
+
+A benchmark always returns a nonzero status if any provider/model run fails. With `--fail-on-miss`, deterministic scoring failures also return a nonzero status, which makes the command useful in CI. Venom replaces its own known artifact files on every benchmark run rather than appending stale results. It does **not** add, store, or manage provider API secrets for you.
+
 ## Output
 
 Each run is written as a JSON object, for example:
@@ -208,7 +233,7 @@ Each run is written as a JSON object, for example:
 - [x] simple deterministic scoring hooks
 - [x] cost/token metadata where providers expose it
 - [x] HTML comparison report
-- [ ] CI-friendly non-interactive benchmark mode
+- [x] CI-friendly non-interactive benchmark mode
 
 ## Project philosophy
 
