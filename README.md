@@ -40,14 +40,14 @@ export ANTHROPIC_API_KEY="..."
 Run a prompt:
 
 ```bash
-venom run --provider openai --model gpt-6-luna --prompt "Explain recursion in one paragraph."
+venom run --provider openai --model YOUR_OPENAI_MODEL --prompt "Explain recursion in one paragraph."
 ```
 
 Or compare providers/models:
 
 ```bash
 venom compare \
-  --model openai:gpt-6-luna \
+  --model openai:YOUR_OPENAI_MODEL \
   --model anthropic:YOUR_CLAUDE_MODEL \
   --prompt "Write a Python function that validates an email address." \
   --out runs.jsonl
@@ -62,7 +62,7 @@ Each run is written as a JSON object, for example:
 ```json
 {
   "provider": "openai",
-  "model": "gpt-6-luna",
+  "model": "YOUR_OPENAI_MODEL",
   "prompt": "Explain recursion in one paragraph.",
   "response": "...",
   "latency_ms": 842.31,
@@ -72,10 +72,10 @@ Each run is written as a JSON object, for example:
 
 ## Roadmap
 
-- [ ] OpenAI provider adapter
-- [ ] Anthropic provider adapter
-- [ ] JSONL run logging
-- [ ] multi-model comparison command
+- [x] OpenAI provider adapter
+- [x] Anthropic provider adapter
+- [x] JSONL run logging
+- [x] multi-model comparison command
 - [ ] prompt suites from YAML/JSON
 - [ ] simple scoring hooks
 - [ ] cost/token metadata where providers expose it
@@ -88,12 +88,12 @@ Venom should stay understandable. A new contributor should be able to read most 
 
 ## Contributing
 
-Issues and pull requests are welcome. Good first contributions include tests, provider metadata, output formatting, and small evaluation utilities.
+Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md). Good first contributions include tests, provider metadata, output formatting, and small evaluation utilities.
 
 ## Security
 
-Never commit API keys. Venom should read credentials from provider SDK environment variables. If you accidentally publish a key, revoke it with the provider immediately.
+Never commit API keys. Venom reads credentials from provider SDK environment variables. If you accidentally publish a key, revoke it with the provider immediately.
 
 ## License
 
-Planned license: MIT.
+MIT — see [LICENSE](LICENSE).
